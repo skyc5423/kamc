@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  front:
+    depends_on:
+      - back
+    build: ./composetest
+    image: kamc:latest
+    ports:
+      - "8501:8501"
+
+  back:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=t7835423
+
+    restart: unless-stopped
