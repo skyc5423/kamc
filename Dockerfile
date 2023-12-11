@@ -8,8 +8,8 @@ COPY . .
 RUN pip install -r requirements.txt
 WORKDIR app/src
 
-EXPOSE 8501
+EXPOSE 8050
 
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+ENV PYTHONPATH "${PYTHONPATH}:/code"
 
-ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501"]
+ENTRYPOINT ["python", "main.py"]
