@@ -9,12 +9,14 @@ class Tabs:
     name: str
     value: str
     sub_tabs: list
+    last_selected: bool
 
-    def __init__(self, order, name, value, sub_tabs: list = None):
+    def __init__(self, order, name, value, sub_tabs: list = None, last_selected=False):
         self.order = order
         self.name = name
         self.value = value
         self.sub_tabs = []
+        self.last_selected = last_selected
         for sub_tab_arg in sub_tabs:
             sub_tab = SubTabs(**sub_tab_arg)
             sub_tab.set_parent_order(self.order)

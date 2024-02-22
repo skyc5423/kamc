@@ -1,0 +1,15 @@
+.custom-col {
+    box-shadow: inset 0 0 10px #f0f0f0; /* 아주 밝은 회색의 내부 음영 */
+    border-radius: 10px; /* 동그란 경계 */
+    border: 1px solid #d0d0d0; /* 내부 음영보다 조금 어두운 회색 경계선 */
+    padding: 10px; /* 내부 여백 */
+    margin-right: 5vw; /* 오른쪽 여백 */
+}
+
+.custom-row {
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    /*style={'display': 'flex', 'alignItems': 'center', 'margin-top': '1vh', 'margin-bottom': '1vh'}*/
+    display: flex;
+    align-items: center;
+}

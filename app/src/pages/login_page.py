@@ -16,9 +16,6 @@ class LoginPage:
 
     def get_layer(self):
         layer = html.Div([
-            html.H2('기본의학교육 데이터베이스',
-                    style={"margin-top": "5vh",
-                           "text-align": "center"}),
             dbc.Col([html.Plaintext(p, style={'margin': '1vh'}) for p in self.prompt_list],
                     style={'border': '1px solid white',
                            "margin-top": "5vh",

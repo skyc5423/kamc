@@ -1,5 +1,5 @@
 from dash import dcc, html
-from app.src.dataclass.tabs import Tabs, SubTabs
+from app.src.database.dataclass.tabs import Tabs
 from app.src.resource.predefined_tabs import TAB_ARGS
 import dash_bootstrap_components as dbc
 import dataclasses
@@ -15,19 +15,14 @@ class MainPage:
         pass
 
     def get_layer(self):
-        children = [html.H2(children='기본의학교육 데이터베이스',
-                            style={"margin-top": "5vh",
-                                   "margin-bottom": "5vh",
-                                   "text-align": "center"}),
-                    dcc.Tabs(id={'index': 0, 'type': 'tabs_main'},
+        children = [dcc.Tabs(id={'index': 0, 'type': 'tabs_main'},
                              value=self.tabs[0].value,
                              children=[tab.get_layer() for tab in self.tabs]),
                     dbc.Tabs(id={'index': 0, 'type': 'tabs_sub'},
                              children=[sub_tab.get_layer() for sub_tab in self.tabs[0].sub_tabs]),
-                    html.Div(id={'index': 0, 'type': 'tabs_main_content'},
-                             children=dcc.Graph(id={'index': 0, 'type': 'main_graph'},
-                                                style={'display': 'none'})),
+                    dcc.Loading(id='loading', type='circle',
+                                children=[html.Div(id={'index': 0, 'type': 'tabs_main_content'})],
+                                loading_state={'is_loading': True, 'color': 'white'}),
                     dcc.Store(id={'index': 0, 'type': 'tabs_main_store'},
                               data=[dataclasses.asdict(tab) for tab in self.tabs])]
-
         return html.Div(children)

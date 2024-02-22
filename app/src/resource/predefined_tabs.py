@@ -54,10 +54,11 @@ TAB_ARGS = [
         {'order': 8, 'name': '학생 연구실험실', 'value': 'sub_tab_facility_student_research_laboratory'},
     ]},
     {'order': 6, 'name': '경영, 재정', 'value': 'tab_management_finance', 'sub_tabs': [
-        {'order': 1, 'name': '교수 역량개발 관련 비용', 'value': 'tab_management_finance_professor_development'},
-        {'order': 2, 'name': '학생교육 관련 비용', 'value': 'tab_management_finance_student_education'},
-        {'order': 3, 'name': '학생 등록금 (1인당)', 'value': 'tab_management_finance_student_tuition'},
+        {'order': 1, 'name': '교수 역량개발 관련 비용', 'value': 'sub_tab_management_finance_professor_development'},
+        {'order': 2, 'name': '학생교육 관련 비용', 'value': 'sub_tab_management_finance_student_education'},
+        {'order': 3, 'name': '학생 등록금 (1인당)', 'value': 'sub_tab_management_finance_student_tuition'},
     ]},
-    {'order': 7, 'name': '공지사항, DB 추출', 'value': 'tab_notice_db_extraction', 'sub_tabs': [
+    {'order': 7, 'name': 'DB 추출', 'value': 'tab_notice_db_extraction', 'sub_tabs': [
+        {'order': 1, 'name': 'DB 추출', 'value': 'sub_tab_notice_db_extraction'},
     ]}
 ]
