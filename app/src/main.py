@@ -37,7 +37,7 @@ app.layout = html.Div([
                            'index': 0
                        }, dismissable=True, is_open=False)],
             style={"margin": "5vh"}),
-    dcc.Store(id='school_name', data="서울"),
+    dcc.Store(id='school_name', data=""),
     dcc.Download(id={
         'type': 'download',
         'index': 0
@@ -59,7 +59,7 @@ def add_row(*args):
             continue
         table_data = table_datas[i]
         table_column = table_columns[i]
-        if '합계' in table_data[0][-1].values():
+        if len(table_data[0]) != 0 and '합계' in table_data[0][-1].values():
             table_data[0].insert(-1, {c['id']: '' for c in table_column[0]})
         else:
             table_data[0].append({c['id']: '' for c in table_column[0]})
@@ -118,11 +118,29 @@ def func(db_extract_clicked, *args):
     return list(button_input_n_clicks) + [[None]]
 
 
-@callback(Output('page-content', 'children'),
-          [Input('url', 'pathname')])
-def display_page(pathname):
+@callback(Output('page-content', 'children', allow_duplicate=True),
+          [Input('url', 'pathname')],
+          State('school_name', 'data'),
+          prevent_initial_call=True)
+def display_page(pathname, school_name):
+    if school_name == '':
+        return LoginPage().get_layer()
     page = MainPage()
     return page.get_layer()
+
+
+@callback([Output('school_name', 'data'),
+           Output('page-content', 'children', allow_duplicate=True)],
+          Input({'type': 'login_password_submit', 'index': ALL}, 'n_clicks'),
+          [State({'type': 'login_id', 'index': ALL}, 'value'),
+           State({'type': 'login_password', 'index': ALL}, 'value')],
+          prevent_initial_call=True)
+def login(n_clicks, school_name, password):
+    if school_name[0] is None:
+        return ['', LoginPage().get_layer()]
+    if len(school_name[0]) == 0:
+        return ['', LoginPage().get_layer()]
+    return [school_name[0], MainPage().get_layer()]
 
 
 @callback(

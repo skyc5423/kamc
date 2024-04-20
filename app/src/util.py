@@ -21,7 +21,10 @@ def get_header(main_tab, sub_tab):
 
 def get_page_content(main_tab, sub_tab, school_list, school_name):
     head = get_header(main_tab, sub_tab)
-    school = [school for school in school_list if getattr(school, '대학명') == school_name][0]
+    matched_school_list = [school for school in school_list if getattr(school, '대학명') == school_name]
+    if len(matched_school_list) == 0:
+        return html.Div('해당 학교의 정보가 없습니다.')
+    school = matched_school_list[0]
     if main_tab == 'tab_general_status':
         if sub_tab == 'sub_tab_general_status_basic_info':
             body = sub_tab_general_status_basic_info(school)
