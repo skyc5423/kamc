@@ -8,7 +8,7 @@ import json
 def sub_tab_education_process_curriculum_committee(school):
     education_process_curriculum_committee_presence = getattr(school, '교육과정위원회_유무', '있음')
     education_process_curriculum_committee_name = getattr(school, '교육과정위원회_명칭', None)
-    education_process_curriculum_committee_education_process = json.loads(getattr(school, '교육과정위원회_담당교육과정', []))
+    education_process_curriculum_committee_education_process = json.loads(getattr(school, '교육과정위원회_담당교육과정', "[]"))
     education_process_curriculum_committee_head = getattr(school, '교육과정위원회_구성_위원장', None)
     education_process_curriculum_committee_head_type = getattr(school, '교육과정위원회_구성_당연직구분', None)
     education_process_curriculum_committee_head_type_etc = getattr(school, '교육과정위원회_구성_당연직구분_기타', None)

@@ -10,7 +10,8 @@ import pymysql
 class DatabaseHelper:
 
     def __init__(self):
-        self.client = MongoClient('mongodb://kamc_root:kamc123456qwer!@43.201.146.205:19999/?authMechanism=DEFAULT')
+
+        self.client = MongoClient('mongodb+srv://kamc:kamc123456qwer!@kamc.q7fcfov.mongodb.net/')
 
     def get_all_data_from_school_name(self):
         school_dict_list = self._get_all_data_kamc()

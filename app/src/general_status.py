@@ -15,13 +15,13 @@ def sub_tab_general_status_basic_info(school):
              '6) 누적 졸업생수 : 설립 이후 해당 학년도까지 누적된 의대‧의전원 총 졸업자 수(의학사, 의무석사 취득자)\n' \
              '- 해당 학년도 졸업생 수를 입력하면 누적 합계는 자동 계산됨.\n' \
              '7) 학교 주소 : 행정실 주소, 대표 전화번호 등'
-    school_name_korean = getattr(school, '국문대학명')
-    school_name_english = getattr(school, '영문대학명')
-    school_establish_year = getattr(school, '설립인가연도')
-    school_first_year = getattr(school, '최초입학연도')
-    school_sum_graduation = getattr(school, '누적졸업횟수')
+    school_name_korean = getattr(school, '국문대학명', None)
+    school_name_english = getattr(school, '영문대학명', None)
+    school_establish_year = getattr(school, '설립인가연도', None)
+    school_first_year = getattr(school, '최초입학연도', None)
+    school_sum_graduation = getattr(school, '누적졸업횟수', None)
     school_sum_alumni = json.loads(getattr(school, '누적졸업생수', "[]"))
-    school_address_list = json.loads(getattr(school, '학교주소_캠퍼스명'))
+    school_address_list = json.loads(getattr(school, '학교주소_캠퍼스명', "[]"))
     alumni_table = dash_table.DataTable(
         id={'index': 0, 'type': 'school_sum_alumni'},
         columns=(
@@ -144,7 +144,7 @@ def sub_tab_general_status_basic_info(school):
 
 
 def sub_tab_general_status_establishment_operation(school):
-    school_establishment_type = getattr(school, '설립유형')
+    school_establishment_type = getattr(school, '설립유형', None)
     school_establishment_name = getattr(school, '설립주체_법인명', None)
     school_establishment_year = getattr(school, '설립주체_법인설립연도', None)
     school_establishment_representative = getattr(school, '설립주체_법인설립당시대표자명', None)
@@ -404,8 +404,7 @@ def sub_tab_general_status_graduation_outcome(school):
     phase_outcome_year = getattr(school, '시기성과_제정연도', None)
     phase_outcome_recent_year = getattr(school, '시기성과_최근개정연도', None)
     phase_outcome_organization = getattr(school, '시기성과_관리기구', None)
-    phase_outcome_open = getattr(school, '시기성과_공개범위', None)
-    phase_outcome_content = getattr(school, '시기성과_파일명', None)
+    phase_outcome_open = getattr(school, '시기성과_공개범위', "교내")
 
     layer = dbc.Col([
         dbc.Row([dbc.Col([html.H6('졸업성과', style={'text-align': 'center', 'margin-top': '5px'})], width=2),
@@ -496,7 +495,7 @@ def sub_tab_general_status_appointment_procedure(school):
     department_president_reappointment_ok = getattr(school, '학장_연임가능여부', "불가능")
     department_president_reappointment_ok_etc = getattr(school, '학장_연임가능여부_기타', None)
     department_president_reappointment_number = getattr(school, '학장_연임가능횟수', None)
-    department_president_reappointment_constraint = [getattr(school, '학장_연임가능제한여부', [])]
+    department_president_reappointment_constraint = json.loads(getattr(school, '학장_연임가능제한여부', "[]"))
     department_president_appointing_authority = getattr(school, '학장_임명권자', None)
     department_president_appointment_method = getattr(school, '학장_선임방법', "직접선거")
     department_president_appointment_method_etc = getattr(school, '학장_선임방법_기타', None)
