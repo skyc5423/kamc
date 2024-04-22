@@ -112,7 +112,7 @@ def func(db_extract_clicked, *args):
             continue
         table_data = table_datas[i][0]
         button_input_n_clicks[i][0] = None
-        graph_html = visualize_state_dict[i]['function'](table_data)
+        graph_html = visualize_state_dict[i]['function'](school_name, table_data)
         file_name = visualize_state_dict[i]['file_name']
         return list(button_input_n_clicks) + [[dict(content=graph_html, filename=f"{file_name}.html")]]
     return list(button_input_n_clicks) + [[None]]

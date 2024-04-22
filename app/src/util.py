@@ -513,7 +513,7 @@ def get_all_data_by_key(key):
     return out
 
 
-def visualize_education_process_curriculum_committee_num(table_data):
+def visualize_education_process_curriculum_committee_num(school_name, table_data):
     charts = []
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -527,7 +527,7 @@ def visualize_education_process_curriculum_committee_num(table_data):
     return graph_html
 
 
-def visualize_school_sum_alumni(table_data):
+def visualize_school_sum_alumni(school_name, table_data):
     charts = []
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -539,7 +539,7 @@ def visualize_school_sum_alumni(table_data):
     return graph_html
 
 
-def visualize_administrative_structure(table_data):
+def visualize_administrative_structure(school_name, table_data):
     charts = []
     total_drop_column = ['업무분야', '담당부서명', '책임보직명', '보직수당_있음', '보직수당_없음', '합계']
     for indiv_data in table_data:
@@ -558,7 +558,7 @@ def visualize_administrative_structure(table_data):
     return graph_html
 
 
-def visualize_education_process_curriculum_week(table_data):
+def visualize_education_process_curriculum_week(school_name, table_data):
     charts = []
     total_drop_column = ['학기']
     for indiv_data in table_data:
@@ -573,7 +573,7 @@ def visualize_education_process_curriculum_week(table_data):
     return graph_html
 
 
-def visualize_education_process_curriculum_clinical_practice_week(table_data):
+def visualize_education_process_curriculum_clinical_practice_week(school_name, table_data):
     charts = []
     total_drop_column = ['학년', '합계']
     for indiv_data in table_data:
@@ -592,7 +592,7 @@ def visualize_education_process_curriculum_clinical_practice_week(table_data):
     return graph_html
 
 
-def visualize_education_process_educational_department(table_data):
+def visualize_education_process_educational_department(school_name, table_data):
     charts = []
     total_drop_column = ['전문부서명', '합계']
     for indiv_data in table_data:
@@ -611,7 +611,7 @@ def visualize_education_process_educational_department(table_data):
     return graph_html
 
 
-def visualize_education_process_humanity_department(table_data):
+def visualize_education_process_humanity_department(school_name, table_data):
     charts = []
     total_drop_column = ['전문부서명', '합계']
     for indiv_data in table_data:
@@ -630,7 +630,7 @@ def visualize_education_process_humanity_department(table_data):
     return graph_html
 
 
-def visualize_student_admission_student(table_data):
+def visualize_student_admission_student(school_name, table_data):
     all_data = get_all_data_by_key('입학학생수')
     charts = []
     total_drop_column = ['구분', '성별', '합계']
@@ -652,7 +652,7 @@ def visualize_student_admission_student(table_data):
     return graph_html
 
 
-def visualize_student_enrolled_student(table_data):
+def visualize_student_enrolled_student(school_name, table_data):
     charts = []
     total_drop_column = ['구분', '성별', '합계']
     for indiv_data in table_data:
@@ -678,7 +678,7 @@ def visualize_student_enrolled_student(table_data):
     return graph_html
 
 
-def visualize_student_admission_student_structure(table_data):
+def visualize_student_admission_student_structure(school_name, table_data):
     charts = []
     total_drop_column = ['입학전형', '총 입학생 대비 비율(%)']
     for indiv_data in table_data:
@@ -693,7 +693,7 @@ def visualize_student_admission_student_structure(table_data):
     return graph_html
 
 
-def visualize_student_scholarship(table_data):
+def visualize_student_scholarship(school_name, table_data):
     charts = []
     df = []
     for indiv_data in table_data:
@@ -711,7 +711,7 @@ def visualize_student_scholarship(table_data):
     return graph_html
 
 
-def visualize_student_graduate_career(table_data):
+def visualize_student_graduate_career(school_name, table_data):
     charts = []
     df = []
     for indiv_data in table_data:
@@ -728,7 +728,7 @@ def visualize_student_graduate_career(table_data):
     return graph_html
 
 
-def visualize_student_graduate_student_basic_domestic(table_data):
+def visualize_student_graduate_student_basic_domestic(school_name, table_data):
     charts = []
     drop_column = ['전공분야']
     dict_by_major = []
@@ -749,7 +749,7 @@ def visualize_student_graduate_student_basic_domestic(table_data):
     return graph_html
 
 
-def visualize_student_graduate_student_basic_foreigner(table_data):
+def visualize_student_graduate_student_basic_foreigner(school_name, table_data):
     charts = []
     drop_column = ['전공분야']
     dict_by_major = []
@@ -770,7 +770,7 @@ def visualize_student_graduate_student_basic_foreigner(table_data):
     return graph_html
 
 
-def visualize_student_graduate_student_clinical_domestic(table_data):
+def visualize_student_graduate_student_clinical_domestic(school_name, table_data):
     charts = []
     drop_column = ['전공분야']
     dict_by_major = []
@@ -791,7 +791,7 @@ def visualize_student_graduate_student_clinical_domestic(table_data):
     return graph_html
 
 
-def visualize_student_graduate_student_clinical_foreigner(table_data):
+def visualize_student_graduate_student_clinical_foreigner(school_name, table_data):
     charts = []
     drop_column = ['전공분야']
     dict_by_major = []
@@ -812,21 +812,21 @@ def visualize_student_graduate_student_clinical_foreigner(table_data):
     return graph_html
 
 
-def visualize_student_per_professor(table_data):
+def visualize_student_per_professor(school_name, table_data):
     # TODO
     charts = []
     graph_html = combine_html(charts)
     return graph_html
 
 
-def visualize_student_international_exchange(table_data):
+def visualize_student_international_exchange(school_name, table_data):
     # TODO
     charts = []
     graph_html = combine_html(charts)
     return graph_html
 
 
-def visualize_professor_professor_basic(table_data):
+def visualize_professor_professor_basic(school_name, table_data):
     charts = []
     drop_column = ['소속교실', '구분']
     dict_by_major = []
@@ -857,7 +857,7 @@ def visualize_professor_professor_basic(table_data):
     return graph_html
 
 
-def visualize_professor_professor_clinical(table_data):
+def visualize_professor_professor_clinical(school_name, table_data):
     charts = []
     drop_column = ['소속교실', '구분']
     dict_by_major = []
@@ -888,7 +888,7 @@ def visualize_professor_professor_clinical(table_data):
     return graph_html
 
 
-def visualize_professor_full_time_new_basic_professor_data(table_data):
+def visualize_professor_full_time_new_basic_professor_data(school_name, table_data):
     charts = []
     drop_column = ['성별']
     for indiv_data in table_data:
@@ -903,7 +903,7 @@ def visualize_professor_full_time_new_basic_professor_data(table_data):
     return graph_html
 
 
-def visualize_professor_full_time_retire_basic_professor_data(table_data):
+def visualize_professor_full_time_retire_basic_professor_data(school_name, table_data):
     charts = []
     drop_column = ['성별']
     for indiv_data in table_data:
@@ -918,7 +918,7 @@ def visualize_professor_full_time_retire_basic_professor_data(table_data):
     return graph_html
 
 
-def visualize_professor_full_time_new_clinical_professor_data(table_data):
+def visualize_professor_full_time_new_clinical_professor_data(school_name, table_data):
     charts = []
     drop_column = ['성별']
     for indiv_data in table_data:
@@ -933,7 +933,7 @@ def visualize_professor_full_time_new_clinical_professor_data(table_data):
     return graph_html
 
 
-def visualize_professor_full_time_retire_clinical_professor_data(table_data):
+def visualize_professor_full_time_retire_clinical_professor_data(school_name, table_data):
     charts = []
     drop_column = ['성별']
     for indiv_data in table_data:
@@ -948,7 +948,7 @@ def visualize_professor_full_time_retire_clinical_professor_data(table_data):
     return graph_html
 
 
-def visualize_professor_medical_education_training(table_data):
+def visualize_professor_medical_education_training(school_name, table_data):
     charts = []
     training_type_list = ['세미나', '학회', '워크숍', '연수']
     for indiv_data in table_data:
@@ -963,7 +963,7 @@ def visualize_professor_medical_education_training(table_data):
     return graph_html
 
 
-def visualize_management_finance_student_tuition_medical_school(table_data):
+def visualize_management_finance_student_tuition_medical_school(school_name, table_data):
     anonymous = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     total_tuition_list = [{
         "이름": "서울의대",
@@ -982,7 +982,7 @@ def visualize_management_finance_student_tuition_medical_school(table_data):
     return graph_html
 
 
-def visualize_management_finance_student_tuition_graduate_medicine(table_data):
+def visualize_management_finance_student_tuition_graduate_medicine(school_name, table_data):
     # TODO
     charts = []
     graph_html = combine_html(charts)
