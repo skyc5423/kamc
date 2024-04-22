@@ -14,6 +14,7 @@ import json
 from database.database_helper import database_helper
 import pandas as pd
 import io
+from database.dataclass.school import School
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 
@@ -79,11 +80,20 @@ def add_row(*args):
 
 @callback(Output({'type': 'alert', 'index': ALL}, 'is_open', allow_duplicate=True),
           [Input({'type': 'refresh', 'index': ALL}, 'n_clicks')],
-          [State('school_name', 'data')] + total_state_list,
+          [State('school_name', 'data'), State('year_dropdown', 'value')] + total_state_list,
           prevent_initial_call=True
           )
-def toggle_alert(n, school_name, *args):
-    school = [school for school in school_list if getattr(school, '대학명') == school_name][0]
+def toggle_alert(n, school_name, year, *args):
+    name_matched_school_list = [school for school in school_list if getattr(school, '대학명') == school_name]
+    if len(name_matched_school_list) == 0:
+        return [False]
+    year_matched_school_list = [school for school in name_matched_school_list if getattr(school, '연도') == year]
+    if len(year_matched_school_list) == 0:
+        school = School()
+        setattr(school, '대학명', school_name)
+        setattr(school, '연도', year)
+    else:
+        school = year_matched_school_list[0]
     for arg, key_dict in zip(args, total_state_key_dict):
         if len(arg) == 0:
             continue

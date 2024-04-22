@@ -240,19 +240,20 @@ class DatabaseHelper:
 
     def _get_all_data_kamc(self):
         db = self.client['kamc']
-        return [doc for doc in db['school'].find()]
+        return [doc for doc in db['school_dev'].find()]
 
     def update_school_data(self, school):
         db = self.client['kamc']
-        collection = db['school']
-        uid = getattr(school, '_id')
+        collection = db['school_dev']
+        uid = getattr(school, '_id', None)
 
         set_dict = {}
         for attr_name in [d for d in dir(school) if not d.startswith('__')]:
             set_dict[attr_name] = getattr(school, attr_name)
-
-        # upsert
-        collection.update_one({'_id': uid}, {'$set': set_dict}, upsert=True)
+        if uid is None:
+            collection.insert_one(set_dict)
+        else:
+            collection.update_one({'_id': uid}, {'$set': set_dict}, upsert=True)
 
 
 database_helper = DatabaseHelper()
