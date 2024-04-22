@@ -1,17 +1,13 @@
-import pymongo
 from pymongo import MongoClient
-from pandas import DataFrame
-import plotly.express as px
 from database.dataclass.school import School
-from util import total_state_key_dict
-import pymysql
+import certifi
 
 
 class DatabaseHelper:
 
     def __init__(self):
-
-        self.client = MongoClient('mongodb+srv://kamc:kamc123456qwer!@kamc.q7fcfov.mongodb.net/')
+        ca = certifi.where()
+        self.client = MongoClient('mongodb+srv://kamc:kamc123456qwer!@kamc.q7fcfov.mongodb.net/', tlsCAFile=ca)
 
     def get_all_data_from_school_name(self):
         school_dict_list = self._get_all_data_kamc()
