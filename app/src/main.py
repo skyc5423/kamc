@@ -23,6 +23,15 @@ app.layout = html.Div([
     html.H2('기본의학교육 데이터베이스',
             style={"margin-top": "5vh",
                    "text-align": "center"}),
+    dcc.Dropdown(id='year_dropdown',
+                 options=[{'label': i, 'value': i} for i in range(2010, 2024)],
+                 value=2020,
+                 style={
+                     "width": "16vh",
+                     "margin": "5vh",
+                     "text-align": "center",
+                     "display": "none"
+                 }),
     dbc.Col([html.Div(id='page-content')]),
     dbc.Col([dbc.Button("Save", id={
         'type': 'refresh',
@@ -130,17 +139,25 @@ def display_page(pathname, school_name):
 
 
 @callback([Output('school_name', 'data'),
-           Output('page-content', 'children', allow_duplicate=True)],
-          Input({'type': 'login_password_submit', 'index': ALL}, 'n_clicks'),
+           Output('page-content', 'children', allow_duplicate=True),
+           Output('year_dropdown', 'style')],
+          [Input({'type': 'login_password_submit', 'index': ALL}, 'n_clicks'),
+           Input('year_dropdown', 'value')
+           ],
           [State({'type': 'login_id', 'index': ALL}, 'value'),
-           State({'type': 'login_password', 'index': ALL}, 'value')],
+           State({'type': 'login_password', 'index': ALL}, 'value'),
+           State('year_dropdown', 'style'),
+           State('school_name', 'data')],
           prevent_initial_call=True)
-def login(n_clicks, school_name, password):
-    if school_name[0] is None:
-        return ['', LoginPage().get_layer()]
-    if len(school_name[0]) == 0:
-        return ['', LoginPage().get_layer()]
-    return [school_name[0], MainPage().get_layer()]
+def login(n_clicks, year, school_name, password, style, saved_school_name):
+    if (len(school_name) < 1 or school_name[0] is None) and saved_school_name == '':
+        return ['', LoginPage().get_layer(), style]
+    style['display'] = 'block'
+    if len(school_name) < 1 or school_name[0] is None:
+        school = saved_school_name
+    else:
+        school = school_name[0]
+    return [school, MainPage().get_layer(), style]
 
 
 @callback(
@@ -151,9 +168,10 @@ def login(n_clicks, school_name, password):
     [Input({'type': 'tabs_main', 'index': MATCH}, 'value'),
      Input({'type': 'tabs_sub', 'index': MATCH}, 'active_tab')],
     [State({'type': 'tabs_main_store', 'index': MATCH}, 'data'),
-     State('school_name', 'data')],
+     State('school_name', 'data'),
+     State('year_dropdown', 'value')],
 )
-def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name):
+def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name, year):
     tab = [t for t in tab_data if t['value'] == main_tab_value][0]
     if tab['last_selected']:
         sub_tabs = []
@@ -161,7 +179,7 @@ def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name):
             st['parent_order'] = tab.get('order')
             sub_tabs.append(SubTabs(**st).get_layer())
         sub_tab = [st for st in tab['sub_tabs'] if st['order'] == int(sub_tab_value.split('-')[1]) + 1][0]['value']
-        main_content = get_page_content(main_tab_value, sub_tab, school_list, school_name)
+        main_content = get_page_content(main_tab_value, sub_tab, school_list, school_name, year)
     else:
         sub_tabs = []
         for t in tab_data:
@@ -171,7 +189,7 @@ def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name):
             st['parent_order'] = tab.get('order')
             sub_tabs.append(SubTabs(**st).get_layer())
         sub_tab = [st for st in tab['sub_tabs'] if st['order'] == 1][0]['value']
-        main_content = get_page_content(main_tab_value, sub_tab, school_list, school_name)
+        main_content = get_page_content(main_tab_value, sub_tab, school_list, school_name, year)
         sub_tab_value = 'tab-0'
     return sub_tabs, main_content, tab_data, sub_tab_value
 

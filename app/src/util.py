@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 from database.database_helper import school_list
+from database.dataclass.school import School
 
 
 def get_header(main_tab, sub_tab):
@@ -20,12 +21,20 @@ def get_header(main_tab, sub_tab):
     return layer
 
 
-def get_page_content(main_tab, sub_tab, school_list, school_name):
+def get_page_content(main_tab, sub_tab, school_list, school_name, year):
     head = get_header(main_tab, sub_tab)
     matched_school_list = [school for school in school_list if getattr(school, '대학명') == school_name]
     if len(matched_school_list) == 0:
-        return html.Div('해당 학교의 정보가 없습니다.')
-    school = matched_school_list[0]
+        return dbc.Row([head, html.H4('해당 대학이 존재하지 않습니다.')],
+                       style={'margin-top': '5vh',
+                              'margin-left': '5vw'})
+    matched_school_list = [school for school in school_list if getattr(school, '연도') == year]
+    if len(matched_school_list) == 0:
+        school = School()
+        setattr(school, '대학명', school_name)
+        setattr(school, '연도', year)
+    else:
+        school = matched_school_list[0]
     if main_tab == 'tab_general_status':
         if sub_tab == 'sub_tab_general_status_basic_info':
             body = sub_tab_general_status_basic_info(school)
