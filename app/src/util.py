@@ -8,6 +8,7 @@ from dash import dcc, html, callback, MATCH, State, ALL, Input, Output
 import pandas as pd
 import plotly.express as px
 import numpy as np
+from database.database_helper import school_list
 
 
 def get_header(main_tab, sub_tab):
@@ -498,6 +499,20 @@ def combine_html(fig_list):
     return combined_html
 
 
+def get_all_data_by_key(key):
+    out = []
+    for school in school_list:
+        data = getattr(school, key, None)
+        if data:
+            try:
+                d = {'data': json.loads(data)}
+                d['대학명'] = getattr(school, '대학명', None)
+                out.append(d)
+            except:
+                continue
+    return out
+
+
 def visualize_education_process_curriculum_committee_num(table_data):
     charts = []
     for indiv_data in table_data:
@@ -616,6 +631,7 @@ def visualize_education_process_humanity_department(table_data):
 
 
 def visualize_student_admission_student(table_data):
+    all_data = get_all_data_by_key('입학학생수')
     charts = []
     total_drop_column = ['구분', '성별', '합계']
     for indiv_data in table_data:
