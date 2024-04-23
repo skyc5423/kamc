@@ -378,7 +378,7 @@ def sub_tab_facility_student_small_group_discussion_room(school):
 
 def sub_tab_facility_dormitory(school):
     student_housing_status_survey = getattr(school, '학생_주거현황_조사_실시_여부', "예")
-    dormitory_type = json.loads(getattr(school, '기숙사_형태', "[]"))
+    dormitory_type = getattr(school, '기숙사_형태', None)
     dormitory_type_etc = getattr(school, '기숙사_형태_기타', None)
     dormitory_student_num = json.loads(getattr(school, '입실_학생수', "[]"))
     student_satisfaction_survey = getattr(school, '학생_만족도_조사_실시_여부', "아니오")
