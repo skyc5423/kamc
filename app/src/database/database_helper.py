@@ -240,11 +240,11 @@ class DatabaseHelper:
 
     def _get_all_data_kamc(self):
         db = self.client['kamc']
-        return [doc for doc in db['school_dev'].find()]
+        return [doc for doc in db['school'].find()]
 
     def update_school_data(self, school):
         db = self.client['kamc']
-        collection = db['school_dev']
+        collection = db['school']
         uid = getattr(school, '_id', None)
 
         set_dict = {}
