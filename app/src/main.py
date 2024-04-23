@@ -24,8 +24,8 @@ app.layout = html.Div([
             style={"margin-top": "5vh",
                    "text-align": "center"}),
     dcc.Dropdown(id='year_dropdown',
-                 options=[{'label': i, 'value': i} for i in range(2010, 2024)],
-                 value=2020,
+                 options=[{'label': i, 'value': i} for i in range(2018, 2025)],
+                 value=2024,
                  style={
                      "width": "16vh",
                      "margin": "5vh",
