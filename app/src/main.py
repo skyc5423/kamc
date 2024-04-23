@@ -34,12 +34,19 @@ app.layout = html.Div([
                      "display": "none"
                  }),
     dbc.Col([html.Div(id='page-content')]),
-    dbc.Col([dbc.Button("Save", id={
-        'type': 'refresh',
-        'index': 0
-    }, color="primary", className="mr-1"), ],
+    dbc.Col(
+        id='col_add_button',
+        children=[dbc.Button("Save",
+                                 id={
+                                     'type': 'refresh',
+                                     'index': 0
+                                 },
+                                 color="primary",
+                                 className="mr-1",
+                                 ), ],
             style={"margin-top": "5vh",
-                   "text-align": "center"}),
+                   "text-align": "center",
+                   "display": "none"}),
     dbc.Col([dbc.Alert("저장되었습니다.", color="success",
                        duration=3000,
                        id={
@@ -150,24 +157,27 @@ def display_page(pathname, school_name):
 
 @callback([Output('school_name', 'data'),
            Output('page-content', 'children', allow_duplicate=True),
-           Output('year_dropdown', 'style')],
+           Output('year_dropdown', 'style'),
+           Output('col_add_button', 'style')],
           [Input({'type': 'login_password_submit', 'index': ALL}, 'n_clicks'),
            Input('year_dropdown', 'value')
            ],
           [State({'type': 'login_id', 'index': ALL}, 'value'),
            State({'type': 'login_password', 'index': ALL}, 'value'),
            State('year_dropdown', 'style'),
-           State('school_name', 'data')],
+           State('school_name', 'data'),
+           State('col_add_button', 'style')],
           prevent_initial_call=True)
-def login(n_clicks, year, school_name, password, style, saved_school_name):
+def login(n_clicks, year, school_name, password, style, saved_school_name, style_button):
     if (len(school_name) < 1 or school_name[0] is None) and saved_school_name == '':
-        return ['', LoginPage().get_layer(), style]
+        return ['', LoginPage().get_layer(), style, style_button]
     style['display'] = 'block'
+    style_button['display'] = 'block'
     if len(school_name) < 1 or school_name[0] is None:
         school = saved_school_name
     else:
         school = school_name[0]
-    return [school, MainPage().get_layer(), style]
+    return [school, MainPage().get_layer(), style, style_button]
 
 
 @callback(
