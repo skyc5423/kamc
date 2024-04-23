@@ -516,7 +516,41 @@ def get_all_data_by_key(key, school=None, year=None):
 
 
 def visualize_education_process_curriculum_committee_num(school_name, table_data):
+    key = '교육과정위원회_위원수'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['교수', '행정직원', '학생', '기타', '계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['교수', '행정직원', '학생', '기타'],
+                            title="학교별 위원 구성 비교",
+                            labels={"value": "위원 수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
         fig = px.pie(df,
@@ -542,7 +576,44 @@ def visualize_school_sum_alumni(school_name, table_data):
 
 
 def visualize_administrative_structure(school_name, table_data):
+    key = '행정구조'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+
+            for data in data_items:
+                for category in ['정규직', '무기계약직', '단기계약직', '기타', '합계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school['대학명']}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(
+        lambda x: 0 if x == school_name else int(x.replace('School ', '')))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['정규직', '무기계약직', '단기계약직', '기타'],
+                            title="학교별 행정직원 수 비교",
+                            labels={"value": "행정직원 수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     total_drop_column = ['업무분야', '담당부서명', '책임보직명', '보직수당_있음', '보직수당_없음', '합계']
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -561,7 +632,48 @@ def visualize_administrative_structure(school_name, table_data):
 
 
 def visualize_education_process_curriculum_week(school_name, table_data):
+    key = '교육주수'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['의예과_1학년', '의예과_2학년', '의학과_1학년', '의학과_2학년', '의학과_3학년', '의학과_4학년']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison_1 = px.bar(df_comparison, x='대학명', y=['의예과_1학년', '의예과_2학년'],
+                            title="학교별 의예과 교육주수 비교",
+                            labels={"value": "교육주수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison_1)
+
+    fig_comparison_2 = px.bar(df_comparison, x='대학명',
+                              y=['의학과_1학년', '의학과_2학년', '의학과_3학년', '의학과_4학년'],
+                              title="학교별 의학과 교육주수 비교",
+                              labels={"value": "교육주수", "variable": "구분"},
+                              barmode='stack')
+    charts.append(fig_comparison_2)
+
     total_drop_column = ['학기']
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -576,7 +688,41 @@ def visualize_education_process_curriculum_week(school_name, table_data):
 
 
 def visualize_education_process_curriculum_clinical_practice_week(school_name, table_data):
+    key = '임상실습_교육주수'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['필수실습', '선택실습', '기타실습', '합계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['필수실습', '선택실습', '기타실습'],
+                            title="학교별 임상실습 교육 주수 비교",
+                            labels={"value": "교육 주수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     total_drop_column = ['학년', '합계']
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -595,7 +741,41 @@ def visualize_education_process_curriculum_clinical_practice_week(school_name, t
 
 
 def visualize_education_process_educational_department(school_name, table_data):
+    key = '의학교육_전문부서'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['전임교수', '겸직교수', '연구교수', '행정직원', '기타', '합계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['전임교수', '겸직교수', '연구교수', '행정직원', '기타'],
+                            title="학교별 의학교육 전문부서 인력 비교",
+                            labels={"value": "인력", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     total_drop_column = ['전문부서명', '합계']
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -637,32 +817,41 @@ def random_num_generation(min, max):
 
 
 def visualize_student_admission_student(school_name, table_data):
-    # Example
-    key = '입학학생수'  # 입학학생수 를 가져와야 함. 무슨 key를 가져와야 할 지 모르겠으면 MongoDB Compass에서 참고
-    all_school = get_all_data_by_key(key=key, school=None, year=None)  # school이나 year 입력 하면 해당 데이터만 가져옴. key는 필수
+    key = '입학학생수'
+    all_school = get_all_data_by_key(key=key, year=2020)
     data_list = []
+    school_label = 1
+    charts = []
     for school in all_school:
         try:
-            data = json.loads(school[key])
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['의예과', '의전원', '편입학', '합계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
             if school['대학명'] != school_name:
-                # 가짜 데이터 넣는 예시
-                random_num = random_num_generation(min=0, max=100)
-                data[0]['의예과'] = random_num
-                data[0]['합계'] = random_num
-                random_num = random_num_generation(min=0, max=100)
-                data[1]['의예과'] = random_num
-                data[1]['합계'] = random_num
-            else:
-                # 여기는 실제 학교니까 (school_name = school['대학명']) 데이터를 그대로 사용
-                data[0]['의예과'] = int(data[0]['의예과'])
-                data[0]['합계'] = int(data[0]['합계'])
-                data[1]['의예과'] = int(data[1]['의예과'])
-                data[1]['합계'] = int(data[1]['합계'])
-            data_list.append(data)
-        except:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
             continue
-    # print(data_list)  # 여기 data_list를 사용해서 시각화 하면 됨
-    charts = []
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['의예과', '의전원', '편입학'],
+                            title="학교별 입학 학생수 비교",
+                            labels={"value": "학생수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     total_drop_column = ['구분', '성별', '합계']
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -683,7 +872,52 @@ def visualize_student_admission_student(school_name, table_data):
 
 
 def visualize_student_enrolled_student(school_name, table_data):
+    key = '재적학생수'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ["의예과_1학년_1학기", "의예과_1학년_2학기", "의예과_2학년_1학기", "의예과_2학년_2학기",
+                                 "의학과_1학년_1학기", "의학과_1학년_2학기", "의학과_2학년_2학기", "의학과_3학년_1학기",
+                                 "의학과_3학년_2학기", "의학과_4학년_1학기", "의학과_4학년_2학기"]:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison_1 = px.bar(df_comparison, x='대학명', y=["의예과_1학년_1학기", "의예과_1학년_2학기", "의예과_2학년_1학기", "의예과_2학년_2학기"],
+                            title="학교별 의예과 재적 학생수 비교",
+                            labels={"value": "학생수", "variable": "구분"},
+                            barmode='stack')
+    fig_comparison_1.show()
+    charts.append(fig_comparison_1)
+
+    fig_comparison_2 = px.bar(df_comparison, x='대학명', y=["의학과_1학년_1학기", "의학과_1학년_2학기", "의학과_2학년_2학기", "의학과_3학년_1학기",
+                                 "의학과_3학년_2학기", "의학과_4학년_1학기", "의학과_4학년_2학기"],
+                              title="학교별 의학과 재적 학생수 비교",
+                              labels={"value": "학생수", "variable": "구분"},
+                              barmode='stack')
+    fig_comparison_2.show()
+    charts.append(fig_comparison_2)
+
     total_drop_column = ['구분', '성별', '합계']
     for indiv_data in table_data:
         df = pd.DataFrame([indiv_data])
@@ -857,7 +1091,62 @@ def visualize_student_international_exchange(school_name, table_data):
 
 
 def visualize_professor_professor_basic(school_name, table_data):
+    key = '교원수_기초의학'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ["전임교원_교수_남", "전임교원_교수_여", "전임교원_부교수_남", "전임교원_부교수_여", "전임교원_조교수_남",
+                                 "전임교원_조교수_여", "전임교원_합계_남", "전임교원_합계_여", "전임교원_합계_계", "본교_출신_교원수",
+                                 "비의사_교원수", "비전임_임상교수", "비전임_연구교수", "비전임_기타", "비전임_합계"]:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison_1 = px.bar(df_comparison, x='대학명', y=["전임교원_교수_남", "전임교원_교수_여", "전임교원_부교수_남",
+                                                         "전임교원_부교수_여", "전임교원_조교수_남", "전임교원_조교수_여"],
+                              title="학교별 전임 교원 수 비교",
+                              labels={"value": "교원 수", "variable": "구분"},
+                              barmode='stack')
+    charts.append(fig_comparison_1)
+
+    fig_comparison_2 = px.bar(df_comparison, x='대학명', y=["본교_출신_교원수"],
+                              title="학교별 본교 출신 교원수 비교",
+                              labels={"value": "교원 수", "variable": "구분"},
+                              barmode='stack')
+    charts.append(fig_comparison_2)
+
+    fig_comparison_3 = px.bar(df_comparison, x='대학명', y=["비의사_교원수"],
+                              title="학교별 비의사 교원수 비교",
+                              labels={"value": "교원 수", "variable": "구분"},
+                              barmode='stack')
+    charts.append(fig_comparison_3)
+
+    fig_comparison_4 = px.bar(df_comparison, x='대학명', y=["비전임_임상교수", "비전임_연구교수", "비전임_기타"],
+                              title="학교별 비전임 교원 수 비교",
+                              labels={"value": "교원 수", "variable": "구분"},
+                              barmode='stack')
+    charts.append(fig_comparison_3)
+
     drop_column = ['소속교실', '구분']
     dict_by_major = []
     for indiv_data in table_data:
@@ -919,7 +1208,41 @@ def visualize_professor_professor_clinical(school_name, table_data):
 
 
 def visualize_professor_full_time_new_basic_professor_data(school_name, table_data):
+    key = '전임교원수_변화_기초의학_신규임용'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['의사', '비의사', '계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['의사', '비의사'],
+                            title="학교별 신규 임용 기초의학 전임교원 수 비교",
+                            labels={"value": "전임교원 수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     drop_column = ['성별']
     for indiv_data in table_data:
         for k, v in indiv_data.items():
@@ -934,7 +1257,41 @@ def visualize_professor_full_time_new_basic_professor_data(school_name, table_da
 
 
 def visualize_professor_full_time_retire_basic_professor_data(school_name, table_data):
+    key = '전임교원수_변화_기초의학_정년퇴임'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ['의사', '비의사', '계']:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=['의사', '비의사'],
+                            title="학교별 정년 퇴임 기초의학 전임교원 수 비교",
+                            labels={"value": "전임교원 수", "variable": "구분"},
+                            barmode='stack')
+    charts.append(fig_comparison)
+
     drop_column = ['성별']
     for indiv_data in table_data:
         for k, v in indiv_data.items():
@@ -979,7 +1336,44 @@ def visualize_professor_full_time_retire_clinical_professor_data(school_name, ta
 
 
 def visualize_professor_medical_education_training(school_name, table_data):
+    key = '의학교육_관련_연수'
+    all_school = get_all_data_by_key(key=key, year=2020)
+    data_list = []
+    school_label = 1
     charts = []
+    for school in all_school:
+        try:
+            data_items = json.loads(school[key])
+            for data in data_items:
+                for category in ["세미나_교내", "세미나_교외", "세미나_계", "학회_교내", "학회_교외", "학회_계", "워크숍_교내",
+                                 "워크숍_교외",  "워크숍_계", "연수_교내", "연수_교외", "연수_계"]:
+                    if isinstance(data[category], str):
+                        data[category] = data[category].replace('\r', '').strip()
+                        data[category] = int(data[category]) if data[category].isdigit() else 0
+
+                current_school = school_name if school['대학명'] == school_name else f"School {school_label}"
+                data_list.append({'대학명': current_school, **data})
+
+            if school['대학명'] != school_name:
+                school_label += 1
+
+        except Exception as e:
+            print(f"Error processing school {school.get('대학명', 'Unknown')}: {e}")
+            continue
+
+    df_comparison = pd.DataFrame(data_list)
+    df_comparison['sort_order'] = df_comparison['대학명'].apply(lambda x: 0 if x == school_name else int(x.split()[1]))
+    df_comparison.sort_values('sort_order', inplace=True)
+    df_comparison.drop(columns=['sort_order'], inplace=True)
+
+    fig_comparison = px.bar(df_comparison, x='대학명', y=["세미나_교내", "세미나_교외", "학회_교내", "학회_교외", "워크숍_교내",
+                                                       "워크숍_교외", "연수_교내", "연수_교외"],
+                            title="학교별 의학교육 관련 연수 비교",
+                            labels={"value": "의학교육 관련 연수", "variable": "구분"},
+                            barmode='stack')
+    fig_comparison.show()
+    charts.append(fig_comparison)
+
     training_type_list = ['세미나', '학회', '워크숍', '연수']
     for indiv_data in table_data:
         for training_type in training_type_list:
