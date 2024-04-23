@@ -47,7 +47,7 @@ app.layout = html.Div([
                "text-align": "center",
                "display": "none"}),
     dbc.Col([dbc.Alert("저장되었습니다.", color="success",
-                       duration=3000,
+                       duration=5000,
                        id={
                            'type': 'alert',
                            'index': 0
