@@ -7,4 +7,4 @@ class School:
         pass
 
     def __repr__(self):
-        return f"{getattr(self, '대학명')}"
+        return f"{getattr(self, '대학명')}_{getattr(self, '연도')}"
