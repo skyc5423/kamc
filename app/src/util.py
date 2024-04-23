@@ -28,7 +28,7 @@ def get_page_content(main_tab, sub_tab, school_list, school_name, year):
         return dbc.Row([head, html.H4('해당 대학이 존재하지 않습니다.')],
                        style={'margin-top': '5vh',
                               'margin-left': '5vw'})
-    matched_school_list = [school for school in school_list if getattr(school, '연도') == year]
+    matched_school_list = [school for school in matched_school_list if getattr(school, '연도') == year]
     if len(matched_school_list) == 0:
         school = School()
         setattr(school, '대학명', school_name)
