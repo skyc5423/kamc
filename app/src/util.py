@@ -8,7 +8,7 @@ from dash import dcc, html, callback, MATCH, State, ALL, Input, Output
 import pandas as pd
 import plotly.express as px
 import numpy as np
-from database.database_helper import school_list
+from database.database_helper import database_helper
 from database.dataclass.school import School
 
 
@@ -21,9 +21,10 @@ def get_header(main_tab, sub_tab):
     return layer
 
 
-def get_page_content(main_tab, sub_tab, school_list, school_name, year):
+def get_page_content(main_tab, sub_tab, school_name, year):
     head = get_header(main_tab, sub_tab)
-    matched_school_list = [school for school in school_list if getattr(school, '대학명') == school_name]
+    matched_school_list = [school for school in database_helper._get_data_from_school_name(school_name) if
+                           getattr(school, '대학명') == school_name]
     if len(matched_school_list) == 0:
         return dbc.Row([head, html.H4('해당 대학이 존재하지 않습니다.')],
                        style={'margin-top': '5vh',
@@ -510,7 +511,7 @@ def combine_html(fig_list):
 
 def get_all_data_by_key(key):
     out = []
-    for school in school_list:
+    for school in database_helper.get_all_data_from_school_name():
         data = getattr(school, key, None)
         if data:
             try:

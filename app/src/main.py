@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 from app.src.database.dataclass.tabs import SubTabs
 import plotly.express as px
-from database.database_helper import database_helper, school_list
+from database.database_helper import database_helper
 from pages.main_page import MainPage
 from pages.login_page import LoginPage
 from util import get_page_content, total_state_list, total_state_key_dict, total_add_button_input, \
@@ -199,8 +199,7 @@ def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name, year)
             st['parent_order'] = tab.get('order')
             sub_tabs.append(SubTabs(**st).get_layer())
         sub_tab = [st for st in tab['sub_tabs'] if st['order'] == int(sub_tab_value.split('-')[1]) + 1][0]['value']
-        main_content = get_page_content(main_tab_value, sub_tab, school_list,
-                                        school_name, year)
+        main_content = get_page_content(main_tab_value, sub_tab, school_name, year)
     else:
         sub_tabs = []
         for t in tab_data:
@@ -210,8 +209,7 @@ def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name, year)
             st['parent_order'] = tab.get('order')
             sub_tabs.append(SubTabs(**st).get_layer())
         sub_tab = [st for st in tab['sub_tabs'] if st['order'] == 1][0]['value']
-        main_content = get_page_content(main_tab_value, sub_tab, school_list,
-                                        school_name, year)
+        main_content = get_page_content(main_tab_value, sub_tab, school_name, year)
         sub_tab_value = 'tab-0'
     return sub_tabs, main_content, tab_data, sub_tab_value
 
