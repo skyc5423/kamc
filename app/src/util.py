@@ -146,6 +146,7 @@ def get_page_content(main_tab, sub_tab, school_name, year):
 
 
 total_add_button_dict = [
+    {'state_key': 'add_school_sum_alumni'},
     {'state_key': 'add_school_address_list'},
     {'state_key': 'add_administrative_structure'},
     {'state_key': 'add_education_process_curriculum_committee_num'},

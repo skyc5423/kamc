@@ -31,6 +31,7 @@ def sub_tab_general_status_basic_info(school):
         ),
         data=school_sum_alumni,
         editable=True,
+        row_deletable=True,
         style_header={
             'backgroundColor': 'rgb(160, 220, 255)',
             'fontWeight': 'bold',
@@ -120,6 +121,9 @@ def sub_tab_general_status_basic_info(school):
                                      id={'index': 0, 'type': 'visualize_school_sum_alumni'},
                                      color="primary",
                                      style={'margin-bottom': '10px', 'margin-left': '20px'})], width='auto'),
+                 dbc.Col([dbc.Button("추가", id={'index': 0, 'type': 'add_school_sum_alumni'}, color="primary",
+                                     style={'margin-bottom': '10px'})
+                          ], width='auto'),
                  ],
                 align='center',
                 className='custom-row'),
