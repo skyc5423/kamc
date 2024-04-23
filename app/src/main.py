@@ -4,14 +4,13 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 from app.src.database.dataclass.tabs import SubTabs
 import plotly.express as px
-from database.database_helper import school_list
+from database.database_helper import database_helper, school_list
 from pages.main_page import MainPage
 from pages.login_page import LoginPage
 from util import get_page_content, total_state_list, total_state_key_dict, total_add_button_input, \
     total_add_button_state, total_add_button_output, visualize_state_dict, visualize_state_list, visualize_input_list, \
     visualize_output_list, extract_school
 import json
-from database.database_helper import database_helper
 import pandas as pd
 import io
 from database.dataclass.school import School
@@ -37,16 +36,16 @@ app.layout = html.Div([
     dbc.Col(
         id='col_add_button',
         children=[dbc.Button("Save",
-                                 id={
-                                     'type': 'refresh',
-                                     'index': 0
-                                 },
-                                 color="primary",
-                                 className="mr-1",
-                                 ), ],
-            style={"margin-top": "5vh",
-                   "text-align": "center",
-                   "display": "none"}),
+                             id={
+                                 'type': 'refresh',
+                                 'index': 0
+                             },
+                             color="primary",
+                             className="mr-1",
+                             ), ],
+        style={"margin-top": "5vh",
+               "text-align": "center",
+               "display": "none"}),
     dbc.Col([dbc.Alert("저장되었습니다.", color="success",
                        duration=3000,
                        id={
@@ -91,7 +90,7 @@ def add_row(*args):
           prevent_initial_call=True
           )
 def toggle_alert(n, school_name, year, *args):
-    name_matched_school_list = [school for school in school_list if getattr(school, '대학명') == school_name]
+    name_matched_school_list = [school for school in database_helper._get_data_from_school_name(school_name)]
     if len(name_matched_school_list) == 0:
         return [False]
     year_matched_school_list = [school for school in name_matched_school_list if getattr(school, '연도') == year]
@@ -129,7 +128,8 @@ def func(db_extract_clicked, *args):
     table_datas = args[button_num + 1:]
     school_name = args[button_num]
     if len(db_extract_clicked) > 0 and db_extract_clicked[0]:
-        school = [school for school in school_list if getattr(school, '대학명') == school_name][0]
+        school = \
+            [school for school in database_helper._get_data_from_school_name(school_name)][0]
         out = extract_school(school)
         return list(button_input_n_clicks) + [[out]]
 
@@ -199,7 +199,8 @@ def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name, year)
             st['parent_order'] = tab.get('order')
             sub_tabs.append(SubTabs(**st).get_layer())
         sub_tab = [st for st in tab['sub_tabs'] if st['order'] == int(sub_tab_value.split('-')[1]) + 1][0]['value']
-        main_content = get_page_content(main_tab_value, sub_tab, school_list, school_name, year)
+        main_content = get_page_content(main_tab_value, sub_tab, school_list,
+                                        school_name, year)
     else:
         sub_tabs = []
         for t in tab_data:
@@ -209,7 +210,8 @@ def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name, year)
             st['parent_order'] = tab.get('order')
             sub_tabs.append(SubTabs(**st).get_layer())
         sub_tab = [st for st in tab['sub_tabs'] if st['order'] == 1][0]['value']
-        main_content = get_page_content(main_tab_value, sub_tab, school_list, school_name, year)
+        main_content = get_page_content(main_tab_value, sub_tab, school_list,
+                                        school_name, year)
         sub_tab_value = 'tab-0'
     return sub_tabs, main_content, tab_data, sub_tab_value
 
