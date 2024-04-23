@@ -107,12 +107,12 @@ def sub_tab_facility_education_basic_facility(school):
     )
     layer = dbc.Col([
         dbc.Row([dbc.Col([html.H6('총 강의실 수', style={'text-align': 'center', 'margin-top': '5px'})], width='auto'),
-                 dbc.Col([dcc.Input(id={'index': 0, 'type': 'etc'},
+                 dbc.Col([dcc.Input(id={'index': 0, 'type': 'facility_num_lecture_room'},
                                     value=facility_num_lecture_room,
                                     type='text')], width='auto'),
                  dbc.Col([html.P('실', style={'text-align': 'left', 'margin-top': '15px'})]),
                  dbc.Col([html.H6('총 실험실습실 수', style={'text-align': 'center', 'margin-top': '5px'})], width='auto'),
-                 dbc.Col([dcc.Input(id={'index': 0, 'type': 'etc'},
+                 dbc.Col([dcc.Input(id={'index': 0, 'type': 'facility_num_laboratory'},
                                     value=facility_num_laboratory,
                                     type='text')], width='auto'),
                  dbc.Col([html.P('실', style={'text-align': 'left', 'margin-top': '15px'})]),
