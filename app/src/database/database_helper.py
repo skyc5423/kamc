@@ -23,6 +23,17 @@ class DatabaseHelper:
         db = self.client['kamc']
         return [doc for doc in db['school'].find()]
 
+    def _get_all_value_by_key_kamc(self, key, year=None, school=None):
+        db = self.client['kamc']
+        proj = {'대학명': 1, key: 1, '연도': 1}
+        if school is not None and year is not None:
+            return [doc for doc in db['school'].find({"대학명": school, "연도": year}, proj)]
+        if school is not None:
+            return [doc for doc in db['school'].find({"대학명": school}, proj)]
+        if year is not None:
+            return [doc for doc in db['school'].find({"연도": year}, proj)]
+        return [doc for doc in db['school'].find({}, proj)]
+
     def _get_data_from_school_name(self, school_name):
         db = self.client['kamc']
         school_dict_list = [doc for doc in db['school'].find({"대학명": school_name})]

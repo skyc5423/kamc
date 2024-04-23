@@ -6,6 +6,7 @@ from facility import *
 from management_finance import *
 from dash import dcc, html, callback, MATCH, State, ALL, Input, Output
 import pandas as pd
+import random
 import plotly.express as px
 import numpy as np
 from database.database_helper import database_helper
@@ -510,18 +511,8 @@ def combine_html(fig_list):
     return combined_html
 
 
-def get_all_data_by_key(key):
-    out = []
-    for school in database_helper.get_all_data_from_school_name():
-        data = getattr(school, key, None)
-        if data:
-            try:
-                d = {'data': json.loads(data)}
-                d['대학명'] = getattr(school, '대학명', None)
-                out.append(d)
-            except:
-                continue
-    return out
+def get_all_data_by_key(key, school=None, year=None):
+    return database_helper._get_all_value_by_key_kamc(key, school=school, year=year)
 
 
 def visualize_education_process_curriculum_committee_num(school_name, table_data):
@@ -641,8 +632,36 @@ def visualize_education_process_humanity_department(school_name, table_data):
     return graph_html
 
 
+def random_num_generation(min, max):
+    return random.randint(min, max)
+
+
 def visualize_student_admission_student(school_name, table_data):
-    all_data = get_all_data_by_key('입학학생수')
+    # Example
+    key = '입학학생수'  # 입학학생수 를 가져와야 함. 무슨 key를 가져와야 할 지 모르겠으면 MongoDB Compass에서 참고
+    all_school = get_all_data_by_key(key=key, school=None, year=None)  # school이나 year 입력 하면 해당 데이터만 가져옴. key는 필수
+    data_list = []
+    for school in all_school:
+        try:
+            data = json.loads(school[key])
+            if school['대학명'] != school_name:
+                # 가짜 데이터 넣는 예시
+                random_num = random_num_generation(min=0, max=100)
+                data[0]['의예과'] = random_num
+                data[0]['합계'] = random_num
+                random_num = random_num_generation(min=0, max=100)
+                data[1]['의예과'] = random_num
+                data[1]['합계'] = random_num
+            else:
+                # 여기는 실제 학교니까 (school_name = school['대학명']) 데이터를 그대로 사용
+                data[0]['의예과'] = int(data[0]['의예과'])
+                data[0]['합계'] = int(data[0]['합계'])
+                data[1]['의예과'] = int(data[1]['의예과'])
+                data[1]['합계'] = int(data[1]['합계'])
+            data_list.append(data)
+        except:
+            continue
+    # print(data_list)  # 여기 data_list를 사용해서 시각화 하면 됨
     charts = []
     total_drop_column = ['구분', '성별', '합계']
     for indiv_data in table_data:
