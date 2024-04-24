@@ -1145,7 +1145,7 @@ def visualize_professor_professor_basic(school_name, table_data):
                               title="학교별 비전임 교원 수 비교",
                               labels={"value": "교원 수", "variable": "구분"},
                               barmode='stack')
-    charts.append(fig_comparison_3)
+    charts.append(fig_comparison_4)
 
     drop_column = ['소속교실', '구분']
     dict_by_major = []
