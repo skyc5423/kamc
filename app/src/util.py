@@ -663,14 +663,14 @@ def visualize_education_process_curriculum_week(school_name, table_data):
 
     fig_comparison_1 = px.bar(df_comparison, x='대학명', y=['의예과_1학년', '의예과_2학년'],
                             title="학교별 의예과 교육주수 비교",
-                            labels={"value": "교육주수", "variable": "구분"},
+                            labels={"value": "교육주수", "variable": "학년"},
                             barmode='stack')
     charts.append(fig_comparison_1)
 
     fig_comparison_2 = px.bar(df_comparison, x='대학명',
                               y=['의학과_1학년', '의학과_2학년', '의학과_3학년', '의학과_4학년'],
                               title="학교별 의학과 교육주수 비교",
-                              labels={"value": "교육주수", "variable": "구분"},
+                              labels={"value": "교육주수", "variable": "학년"},
                               barmode='stack')
     charts.append(fig_comparison_2)
 
@@ -903,14 +903,16 @@ def visualize_student_enrolled_student(school_name, table_data):
     df_comparison.sort_values('sort_order', inplace=True)
     df_comparison.drop(columns=['sort_order'], inplace=True)
 
-    fig_comparison_1 = px.bar(df_comparison, x='대학명', y=["의예과_1학년_1학기", "의예과_1학년_2학기", "의예과_2학년_1학기", "의예과_2학년_2학기"],
+    df_comparison_limited = df_comparison.iloc[:2]
+
+    fig_comparison_1 = px.bar(df_comparison_limited, x='대학명', y=["의예과_1학년_1학기", "의예과_1학년_2학기", "의예과_2학년_1학기", "의예과_2학년_2학기"],
                             title="학교별 의예과 재적 학생수 비교",
                             labels={"value": "학생수", "variable": "구분"},
                             barmode='stack')
     fig_comparison_1.show()
     charts.append(fig_comparison_1)
 
-    fig_comparison_2 = px.bar(df_comparison, x='대학명', y=["의학과_1학년_1학기", "의학과_1학년_2학기", "의학과_2학년_2학기", "의학과_3학년_1학기",
+    fig_comparison_2 = px.bar(df_comparison_limited, x='대학명', y=["의학과_1학년_1학기", "의학과_1학년_2학기", "의학과_2학년_2학기", "의학과_3학년_1학기",
                                  "의학과_3학년_2학기", "의학과_4학년_1학기", "의학과_4학년_2학기"],
                               title="학교별 의학과 재적 학생수 비교",
                               labels={"value": "학생수", "variable": "구분"},
@@ -1243,14 +1245,15 @@ def visualize_professor_full_time_new_basic_professor_data(school_name, table_da
                             barmode='stack')
     charts.append(fig_comparison)
 
-    drop_column = ['성별']
     for indiv_data in table_data:
         for k, v in indiv_data.items():
             if isinstance(v, str) and v.isdigit():
                 indiv_data[k] = int(v)
-        fig = px.pie(pd.DataFrame([indiv_data]),
-                     values=pd.DataFrame([indiv_data]).drop(columns=drop_column).values[0],
-                     names=pd.DataFrame([indiv_data]).drop(columns=drop_column).columns)
+        df = pd.DataFrame([indiv_data])
+        df_filtered = df.iloc[:, 1:-1]
+        fig = px.pie(df_filtered,
+                     values=df_filtered.values[0],
+                     names=df_filtered.columns)
         charts.append(fig)
     graph_html = combine_html(charts)
     return graph_html
@@ -1292,14 +1295,15 @@ def visualize_professor_full_time_retire_basic_professor_data(school_name, table
                             barmode='stack')
     charts.append(fig_comparison)
 
-    drop_column = ['성별']
     for indiv_data in table_data:
         for k, v in indiv_data.items():
             if isinstance(v, str) and v.isdigit():
                 indiv_data[k] = int(v)
-        fig = px.pie(pd.DataFrame([indiv_data]),
-                     values=pd.DataFrame([indiv_data]).drop(columns=drop_column).values[0],
-                     names=pd.DataFrame([indiv_data]).drop(columns=drop_column).columns)
+        df = pd.DataFrame([indiv_data])
+        df_filtered = df.iloc[:, 1:-1]
+        fig = px.pie(df_filtered,
+                     values=df_filtered.values[0],
+                     names=df_filtered.columns)
         charts.append(fig)
     graph_html = combine_html(charts)
     return graph_html
@@ -1307,14 +1311,15 @@ def visualize_professor_full_time_retire_basic_professor_data(school_name, table
 
 def visualize_professor_full_time_new_clinical_professor_data(school_name, table_data):
     charts = []
-    drop_column = ['성별']
     for indiv_data in table_data:
         for k, v in indiv_data.items():
             if isinstance(v, str) and v.isdigit():
                 indiv_data[k] = int(v)
-        fig = px.pie(pd.DataFrame([indiv_data]),
-                     values=pd.DataFrame([indiv_data]).drop(columns=drop_column).values[0],
-                     names=pd.DataFrame([indiv_data]).drop(columns=drop_column).columns)
+        df = pd.DataFrame([indiv_data])
+        df_filtered = df.iloc[:, 1:-1]
+        fig = px.pie(df_filtered,
+                     values=df_filtered.values[0],
+                     names=df_filtered.columns)
         charts.append(fig)
     graph_html = combine_html(charts)
     return graph_html
@@ -1322,14 +1327,15 @@ def visualize_professor_full_time_new_clinical_professor_data(school_name, table
 
 def visualize_professor_full_time_retire_clinical_professor_data(school_name, table_data):
     charts = []
-    drop_column = ['성별']
     for indiv_data in table_data:
         for k, v in indiv_data.items():
             if isinstance(v, str) and v.isdigit():
                 indiv_data[k] = int(v)
-        fig = px.pie(pd.DataFrame([indiv_data]),
-                     values=pd.DataFrame([indiv_data]).drop(columns=drop_column).values[0],
-                     names=pd.DataFrame([indiv_data]).drop(columns=drop_column).columns)
+        df = pd.DataFrame([indiv_data])
+        df_filtered = df.iloc[:, 1:-1]
+        fig = px.pie(df_filtered,
+                     values=df_filtered.values[0],
+                     names=df_filtered.columns)
         charts.append(fig)
     graph_html = combine_html(charts)
     return graph_html
