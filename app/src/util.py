@@ -24,7 +24,7 @@ def get_header(main_tab, sub_tab):
 
 def get_page_content(main_tab, sub_tab, school_name, year):
     head = get_header(main_tab, sub_tab)
-    matched_school_list = [school for school in database_helper._get_data_from_school_name(school_name) if
+    matched_school_list = [school for school in database_helper._get_data_from_school_name_year(school_name) if
                            getattr(school, '대학명') == school_name]
     if len(matched_school_list) == 0:
         return dbc.Row([head, html.H4('해당 대학이 존재하지 않습니다.')],

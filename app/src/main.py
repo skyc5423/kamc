@@ -17,21 +17,66 @@ from database.dataclass.school import School
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 
+modal_load_year = dbc.Modal(
+    [
+        dbc.ModalHeader("데이터 불러오기"),
+        dbc.ModalBody(
+            html.Div([
+                html.P("특정 연도의 데이터를 불러와서 현재 연도의 데이터에 덮어씌웁니다.", style={"text-align": "left"}),
+                html.P("불러올 연도를 선택하고 Load 버튼을 눌러주세요.", style={"text-align": "left"}),
+                dcc.Dropdown(
+                    id='year_dropdown_modal',
+                    options=[{'label': i, 'value': i} for i in range(2018, 2025)],
+                    value=2024,
+                    style={
+                        "width": "150px",
+                        "margin-left": "0",
+                    }
+                )
+            ])
+        ),
+        dbc.ModalFooter(
+            html.Div([
+                dbc.Button("Load", id="load_modal_button", className="mr-2"),
+                dbc.Button("Close", id="close_modal_button", className="ml-2")
+            ], style={"display": "flex", "justify-content": "center", "gap": "10px"})
+        ),
+    ],
+    id="modal",
+    is_open=False,
+    centered=True,
+)
+
 # Define the layout of the app
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.H2('기본의학교육 데이터베이스',
             style={"margin-top": "5vh",
                    "text-align": "center"}),
-    dcc.Dropdown(id='year_dropdown',
-                 options=[{'label': i, 'value': i} for i in range(2018, 2025)],
-                 value=2024,
-                 style={
-                     "width": "16vh",
-                     "margin": "5vh",
-                     "text-align": "center",
-                     "display": "none"
-                 }),
+    dbc.Col([
+        dbc.Row([
+            dbc.Col([dcc.Dropdown(id='year_dropdown',
+                                  options=[{'label': i, 'value': i} for i in range(2018, 2025)],
+                                  value=2024,
+                                  style={
+                                      "width": "16vh",
+                                      "height": "5vh",
+                                      "margin": "5vh",
+                                      "text-align": "center",
+                                      "display": "none"
+                                  }), ], width=2),
+            dbc.Col([
+                dbc.Button("데이터 불러오기",
+                           id="open_modal_button",
+                           color="primary",
+                           style={
+                               "width": "16vh",
+                               "height": "5vh",
+                               "margin": "5vh",
+                               "display": "none"
+                           }), ], width='auto')
+        ])
+    ], align="center"),
     dbc.Col([html.Div(id='page-content')]),
     dbc.Col(
         id='col_add_button',
@@ -57,8 +102,74 @@ app.layout = html.Div([
     dcc.Download(id={
         'type': 'download',
         'index': 0
-    })
+    }),
+    modal_load_year
 ])
+
+
+@app.callback(
+    Output("modal", "is_open", allow_duplicate=True),
+    [Input("open_modal_button", "n_clicks")],
+    [State("modal", "is_open")],
+    prevent_initial_call=True
+)
+def toggle_modal(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("modal", "is_open", allow_duplicate=True),
+    [Input("close_modal_button", "n_clicks")],
+    [State("modal", "is_open")],
+    prevent_initial_call=True
+)
+def close_modal(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    [Output("modal", "is_open", allow_duplicate=True)],
+    [Input('load_modal_button', 'n_clicks')],
+    [State('year_dropdown_modal', 'value'),
+     State('year_dropdown', 'value'),
+     State('school_name', 'data')],
+    prevent_initial_call=True
+)
+def load_data(n_clicks, year_modal, year, school_name):
+    try:
+        selected_school = [school for school in
+                           database_helper._get_data_from_school_name_year(school_name, year_modal)]
+        target_school = [school for school in database_helper._get_data_from_school_name_year(school_name, year)]
+        if len(target_school) == 0:
+            if len(selected_school) == 0:
+                new_school = School()
+                setattr(new_school, '대학명', school_name)
+                setattr(new_school, '연도', year)
+                database_helper.update_school_data(new_school)
+            else:
+                source_school = selected_school[0]
+                new_school = School()
+                for attr_name in [d for d in dir(source_school) if not d.startswith('_')]:
+                    setattr(new_school, attr_name, getattr(source_school, attr_name))
+                setattr(new_school, '연도', year)
+                database_helper.update_school_data(new_school)
+        else:
+            if len(selected_school) == 0:
+                return [False]
+            else:
+                source_school = selected_school[0]
+                target_school = target_school[0]
+                for attr_name in [d for d in dir(source_school) if not d.startswith('_')]:
+                    setattr(target_school, attr_name, getattr(source_school, attr_name))
+                setattr(target_school, '연도', year)
+                database_helper.update_school_data(target_school)
+    except:
+        return [True]
+    return [False]
 
 
 @callback(total_add_button_output,
@@ -90,7 +201,7 @@ def add_row(*args):
           prevent_initial_call=True
           )
 def toggle_alert(n, school_name, year, *args):
-    name_matched_school_list = [school for school in database_helper._get_data_from_school_name(school_name)]
+    name_matched_school_list = [school for school in database_helper._get_data_from_school_name_year(school_name)]
     if len(name_matched_school_list) == 0:
         return [False]
     year_matched_school_list = [school for school in name_matched_school_list if getattr(school, '연도') == year]
@@ -129,7 +240,7 @@ def func(db_extract_clicked, *args):
     school_name = args[button_num]
     if len(db_extract_clicked) > 0 and db_extract_clicked[0]:
         school = \
-            [school for school in database_helper._get_data_from_school_name(school_name)][0]
+            [school for school in database_helper._get_data_from_school_name_year(school_name)][0]
         out = extract_school(school)
         return list(button_input_n_clicks) + [[out]]
 
@@ -158,7 +269,8 @@ def display_page(pathname, school_name):
 @callback([Output('school_name', 'data'),
            Output('page-content', 'children', allow_duplicate=True),
            Output('year_dropdown', 'style'),
-           Output('col_add_button', 'style')],
+           Output('col_add_button', 'style'),
+           Output('open_modal_button', 'style')],
           [Input({'type': 'login_password_submit', 'index': ALL}, 'n_clicks'),
            Input('year_dropdown', 'value')
            ],
@@ -166,18 +278,20 @@ def display_page(pathname, school_name):
            State({'type': 'login_password', 'index': ALL}, 'value'),
            State('year_dropdown', 'style'),
            State('school_name', 'data'),
-           State('col_add_button', 'style')],
+           State('col_add_button', 'style'),
+           State("open_modal_button", "style")],
           prevent_initial_call=True)
-def login(n_clicks, year, school_name, password, style, saved_school_name, style_button):
+def login(n_clicks, year, school_name, password, style, saved_school_name, style_button, style_modal_button):
     if (len(school_name) < 1 or school_name[0] is None) and saved_school_name == '':
-        return ['', LoginPage().get_layer(), style, style_button]
+        return ['', LoginPage().get_layer(), style, style_button, style_modal_button]
     style['display'] = 'block'
     style_button['display'] = 'block'
+    style_modal_button['display'] = 'block'
     if len(school_name) < 1 or school_name[0] is None:
         school = saved_school_name
     else:
         school = school_name[0]
-    return [school, MainPage().get_layer(), style, style_button]
+    return [school, MainPage().get_layer(), style, style_button, style_modal_button]
 
 
 @callback(
@@ -186,12 +300,13 @@ def login(n_clicks, year, school_name, password, style, saved_school_name, style
      Output({'type': 'tabs_main_store', 'index': MATCH}, 'data'),
      Output({'type': 'tabs_sub', 'index': MATCH}, 'active_tab')],
     [Input({'type': 'tabs_main', 'index': MATCH}, 'value'),
-     Input({'type': 'tabs_sub', 'index': MATCH}, 'active_tab')],
+     Input({'type': 'tabs_sub', 'index': MATCH}, 'active_tab'),
+     Input("modal", "is_open")],
     [State({'type': 'tabs_main_store', 'index': MATCH}, 'data'),
      State('school_name', 'data'),
      State('year_dropdown', 'value')],
 )
-def change_tab_value(main_tab_value, sub_tab_value, tab_data, school_name, year):
+def change_tab_value(main_tab_value, sub_tab_value, modal_open, tab_data, school_name, year):
     tab = [t for t in tab_data if t['value'] == main_tab_value][0]
     if tab['last_selected']:
         sub_tabs = []

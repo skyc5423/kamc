@@ -34,9 +34,16 @@ class DatabaseHelper:
             return [doc for doc in db['school'].find({"연도": year}, proj)]
         return [doc for doc in db['school'].find({}, proj)]
 
-    def _get_data_from_school_name(self, school_name):
+    def _get_data_from_school_name_year(self, school_name=None, year=None):
+        if school_name is None and year is None:
+            return self._get_all_data_kamc()
         db = self.client['kamc']
-        school_dict_list = [doc for doc in db['school'].find({"대학명": school_name})]
+        if school_name is not None and year is not None:
+            school_dict_list = [doc for doc in db['school'].find({"대학명": school_name, "연도": year})]
+        elif school_name is not None:
+            school_dict_list = [doc for doc in db['school'].find({"대학명": school_name})]
+        else:
+            school_dict_list = [doc for doc in db['school'].find({"연도": year})]
         school_list = []
         for school_dict in school_dict_list:
             school = School()
