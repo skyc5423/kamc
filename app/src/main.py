@@ -1,5 +1,5 @@
+from dash import Dash, dcc, html, callback, MATCH, State, ALL
 import dash
-from dash import dcc, html, callback, MATCH, State, ALL
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 from app.src.database.dataclass.tabs import SubTabs
@@ -14,6 +14,7 @@ import json
 import pandas as pd
 import io
 from database.dataclass.school import School
+from flask import Flask, request
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 
@@ -103,8 +104,61 @@ app.layout = html.Div([
         'type': 'download',
         'index': 0
     }),
-    modal_load_year
+    modal_load_year,
+    dcc.Location(id='dummy-location', refresh=False),
+    dcc.Store(id='popup-trigger'),
+    dcc.Interval(
+        id='interval-component',
+        interval=10 * 1000,  # in milliseconds
+        n_intervals=0
+    ),
 ])
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <script type="text/javascript">
+            function openPopup(url) {
+                window.open(url, '_blank', 'width=600,height=400');
+            }
+        </script>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
+
+@app.server.route('/popup/<int:notice_id>')
+def popup(notice_id):
+    notices = database_helper.get_notice()
+    if 0 <= notice_id < len(notices):
+        notice = notices[notice_id]
+        return f'''
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title> 공지사항 </title>
+            </head>
+            <body>
+                <h2>{notice['head']}</h2>
+                <p>{notice['body']}</p>
+                <p>{notice['time']}</p>
+            </body>
+        </html>
+        '''
+    else:
+        return "Notice not found", 404
 
 
 @app.callback(
@@ -270,10 +324,10 @@ def display_page(pathname, school_name):
            Output('page-content', 'children', allow_duplicate=True),
            Output('year_dropdown', 'style'),
            Output('col_add_button', 'style'),
-           Output('open_modal_button', 'style')],
+           Output('open_modal_button', 'style'),
+           Output('popup-trigger', 'data')],
           [Input({'type': 'login_password_submit', 'index': ALL}, 'n_clicks'),
-           Input('year_dropdown', 'value')
-           ],
+           Input('year_dropdown', 'value')],
           [State({'type': 'login_id', 'index': ALL}, 'value'),
            State({'type': 'login_password', 'index': ALL}, 'value'),
            State('year_dropdown', 'style'),
@@ -283,15 +337,39 @@ def display_page(pathname, school_name):
           prevent_initial_call=True)
 def login(n_clicks, year, school_name, password, style, saved_school_name, style_button, style_modal_button):
     if (len(school_name) < 1 or school_name[0] is None) and saved_school_name == '':
-        return ['', LoginPage().get_layer(), style, style_button, style_modal_button]
+        return ['', LoginPage().get_layer(), style, style_button, style_modal_button, dash.no_update]
+
+    user = database_helper.verify_login(school_name[0], password[0])
+    if not user:
+        return ['', LoginPage().get_layer(), style, style_button, style_modal_button, dash.no_update]
+
     style['display'] = 'block'
     style_button['display'] = 'block'
     style_modal_button['display'] = 'block'
+
     if len(school_name) < 1 or school_name[0] is None:
         school = saved_school_name
     else:
         school = school_name[0]
-    return [school, MainPage().get_layer(), style, style_button, style_modal_button]
+
+    notices = database_helper.get_notice()  # Fetch latest notices
+    popups_to_open = [f'/popup/{i}' for i in range(len(notices))]
+
+    return [school, MainPage().get_layer(), style, style_button, style_modal_button, popups_to_open]
+
+
+app.clientside_callback(
+    """
+    function(triggers) {
+        if (Array.isArray(triggers)) {
+            triggers.forEach(url => openPopup(url));
+        }
+        return "";
+    }
+    """,
+    Output('dummy-location', 'pathname'),
+    Input('popup-trigger', 'data')
+)
 
 
 @callback(

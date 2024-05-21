@@ -65,6 +65,61 @@ class DatabaseHelper:
         else:
             collection.update_one({'_id': uid}, {'$set': set_dict}, upsert=True)
 
+    def get_notice(self):
+        db = self.client['kamc']
+        return [doc for doc in db['notices'].find({'active': True})]
+
+    def insert_notice(self, notice):
+        try:
+            db = self.client['kamc']
+            collection = db['notices']
+            collection.insert_one(notice)
+            return True
+        except:
+            return False
+
+    def deactivate_notice(self, notice):
+        try:
+            db = self.client['kamc']
+            collection = db['notices']
+            collection.update_one({'_id': notice['_id']}, {'$set': {'active': False}})
+            return True
+        except:
+            return False
+
+    def verify_login(self, user_id, pw):
+        try:
+            db = self.client['kamc']
+            collection = db['users']
+            user = collection.find_one({'id': user_id, 'password': pw})
+            return user
+        except:
+            return None
+
+    def get_all_user(self):
+        db = self.client['kamc']
+        return [doc for doc in db['users'].find()]
+
+    def add_user(self, user):
+        try:
+            db = self.client['kamc']
+            collection = db['users']
+            collection.insert_one(user)
+            return True
+        except:
+            return False
+
+    def change_password(self, user):
+        try:
+            user_id = user['user_id']
+            pw = user['pw']
+            db = self.client['kamc']
+            collection = db['users']
+            collection.update_one({'user_id': user_id}, {'$set': {'pw': pw}})
+            return True
+        except:
+            return False
+
 
 database_helper = DatabaseHelper()
 school_list = database_helper.get_all_data_from_school_name()
